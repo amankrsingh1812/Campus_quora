@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "60967470327",
+    "firebase_url": "https://campus-quora.firebaseio.com",
+    "project_id": "campus-quora",
+    "storage_bucket": "campus-quora.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:60967470327:android:69329fbcdad8c6b3e43ff2",
+        "android_client_info": {
+          "package_name": "com.android.campusquora"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "60967470327-5cpesatje4d22idbmhd9d5p851hk5ne2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.campusquora",
+            "certificate_hash": "5cc704e30f49f27c39cf3a2eb30eda0744cd6ee4"
+          }
+        },
+        {
+          "client_id": "60967470327-6frdf7q0ne0j5fadmrkshuq8u02sgluh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSvcwdfMHF0vs0Ffnqxr5NAcXR5E_s-Ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "60967470327-6frdf7q0ne0j5fadmrkshuq8u02sgluh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
