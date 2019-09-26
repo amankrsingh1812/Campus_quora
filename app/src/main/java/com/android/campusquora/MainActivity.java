@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -23,26 +24,49 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 123;
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.v(LOG_TAG, "onCreate");
+
         setContentView(R.layout.activity_main);
-        createSignInIntent();
+        mAuth = FirebaseAuth.getInstance();
+        //createSignInIntent();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.v(LOG_TAG, "onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.v(LOG_TAG, "onOptionsItemSelected");
         if(item.getItemId() == R.id.sign_out) {
             signOut();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.v(LOG_TAG, "onStart");
+        FirebaseUser user = mAuth.getCurrentUser();
+        updateUI(user);
+    }
+
+    private void updateUI(FirebaseUser user) {
+        if(user == null) {
+            finish();
+            startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+        }
     }
 
     public void createSignInIntent() {
