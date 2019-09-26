@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         mAuth = FirebaseAuth.getInstance();
-        //createSignInIntent();
     }
 
     @Override
@@ -50,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "onOptionsItemSelected");
         if(item.getItemId() == R.id.sign_out) {
             signOut();
+        } else if(item.getItemId() == R.id.settings) {
+            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -69,45 +70,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void createSignInIntent() {
-        // [START auth_fui_create_intent]
-        // Choose authentication providers
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.GoogleBuilder().build(),
-                new AuthUI.IdpConfig.EmailBuilder().build());
-
-        // Create and launch sign-in intent
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);
-        // [END auth_fui_create_intent]
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            if (resultCode == RESULT_OK) {
-                // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                // ...
-            } else {
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
-            }
-        }
-    }
-
     public void signOut() {
-        // [START auth_fui_signout]
         AuthUI.getInstance()
                 .signOut(this)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -116,6 +79,5 @@ public class MainActivity extends AppCompatActivity {
                         isDestroyed();
                     }
                 });
-        // [END auth_fui_signout]
     }
 }

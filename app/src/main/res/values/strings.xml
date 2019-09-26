@@ -2,4 +2,7 @@
     <string name="app_name">Campus-Quora</string>
     <string name="title_activity_login">Sign In</string>
     <string name="forgot_password">Forgot Password</string>
+    <string name="user_profile_pic_content_description">user profile pic</string>
+    <string name="update_button">UPDATE</string>
+    <string name="profile_bio_hint">Write your Bio...</string>
 </resources>
