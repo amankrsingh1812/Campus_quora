@@ -2,5 +2,4 @@
     <string name="app_name">Campus-Quora</string>
     <string name="title_activity_login">Sign In</string>
     <string name="forgot_password">Forgot Password</string>
-    <string name="title_activity_main2">Main2Activity</string>
 </resources>
