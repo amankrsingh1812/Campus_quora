@@ -9,13 +9,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.AbsListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.campusquora.model.Post;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,30 +24,40 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements PostAdapter.OnNoteListener {
-    private ProgressDialog progressDialog;
+
+    private static final int DOWNLOAD_BATCH_SIZE = 10;
+
+//    private ProgressDialog progressDialog;
+    private ProgressBar postLoadingProgressBar;
     private PostAdapter adapter;
-    private List<posts> itemList;
+    private List<Post> itemList;
     private CollectionReference dataref= FirebaseFirestore.getInstance().collection("Posts");
+    private DocumentSnapshot lastVisible = null;
     private static final int RC_SIGN_IN = 123;
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
-private FloatingActionButton newp;
+    private FloatingActionButton newp;
+    private boolean isScrolling = false;
+    private boolean allPostsLoaded = false;
+    LinearLayoutManager linearLayoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        progressDialog=new ProgressDialog(this);
+//        progressDialog=new ProgressDialog(this);
+        postLoadingProgressBar = findViewById(R.id.post_loading_progress_bar);
         itemList=new ArrayList<>();
         newp=findViewById(R.id.fab);
         newp.setOnClickListener(new View.OnClickListener() {
@@ -56,6 +67,7 @@ private FloatingActionButton newp;
                 startActivity(new Intent(getApplicationContext(), NewPost.class));
             }
             });
+        linearLayoutManager = new LinearLayoutManager(this);
         setUpRecyclerView();
     }
 
@@ -121,40 +133,84 @@ private FloatingActionButton newp;
         }
     }
     private void setUpRecyclerView(){
-        progressDialog.setMessage("Loading Posts ...");
-        progressDialog.show();
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
-
-
+//        progressDialog.setMessage("Loading Posts ...");
+//        progressDialog.show();
+//        progressDialog.setCancelable(false);
+//        progressDialog.setCanceledOnTouchOutside(false);
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         adapter=new PostAdapter(itemList,this,this);
         recyclerView.setAdapter(adapter);
         itemList.clear();
+        getPostsFromFirestore();
 
-        dataref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if(newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    isScrolling = true;
+                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int currentItems = linearLayoutManager.getChildCount();
+                int totalItems = linearLayoutManager.getItemCount();
+                int scrolledItems = linearLayoutManager.findFirstVisibleItemPosition();
+
+                if(isScrolling && currentItems + scrolledItems == totalItems) {
+                    isScrolling = false;
+                    getPostsFromFirestore();
+                }
+            }
+        });
+
+
+    }
+
+    private void getPostsFromFirestore() {
+        if(allPostsLoaded) return;
+        postLoadingProgressBar.setVisibility(View.VISIBLE);
+        Query query;
+        if(lastVisible != null) {
+            query = dataref.orderBy("Heading").startAfter(lastVisible).limit(DOWNLOAD_BATCH_SIZE);
+        } else {
+            query = dataref.orderBy("Heading").limit(DOWNLOAD_BATCH_SIZE);
+        }
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()){
-                    for(QueryDocumentSnapshot documentSnapshot: task.getResult()){
-                        itemList.add(new posts(documentSnapshot.get("Heading").toString(),documentSnapshot.get("Text").toString(),documentSnapshot.getLong("Likes"),documentSnapshot.getLong("DisLikes"),(ArrayList<String>)documentSnapshot.get("Tags")));
+                    QuerySnapshot querySnapshot = task.getResult();
+                    for(QueryDocumentSnapshot documentSnapshot: querySnapshot){
+                        itemList.add(new Post(documentSnapshot.get("Heading").toString(),documentSnapshot.get("Text").toString(),documentSnapshot.getLong("Likes"),documentSnapshot.getLong("DisLikes"),(ArrayList<String>)documentSnapshot.get("Tags")));
                     }
+                    if(querySnapshot.getDocuments().size() > 0) {
+                        lastVisible = querySnapshot.getDocuments().get(task.getResult().getDocuments().size() - 1);
+                    } else {
+                        lastVisible = null;
+                        allPostsLoaded = true;
+                    }
+
                     adapter.notifyDataSetChanged();
                     adapter.filterList(itemList);
-                    progressDialog.hide();
+//                    progressDialog.hide();
 
                 }
                 else{
                     String error=task.getException().getMessage();
-                    progressDialog.hide();
+//                    progressDialog.hide();
                     Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT).show();
                 }
 //                bar.dismiss();
             }
         });
+        postLoadingProgressBar.setVisibility(View.GONE);
     }
 
 
@@ -172,7 +228,7 @@ private FloatingActionButton newp;
     }
 
     @Override
-    public void onNoteClick(posts it) {
+    public void onNoteClick(Post it) {
         Toast.makeText(MainActivity.this, "Okay", Toast.LENGTH_SHORT).show();
     }
 }

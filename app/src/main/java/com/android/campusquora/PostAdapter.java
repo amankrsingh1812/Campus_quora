@@ -1,31 +1,25 @@
 package com.android.campusquora;
 
-import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.common.api.AvailabilityException;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.android.campusquora.model.Post;
 
 import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
-    private List<posts> itemList;
+    private List<Post> itemList;
     private Context context;
     private   OnNoteListener mOnNoteListener;
 
 
-    public PostAdapter(List<posts> itemList, Context context,OnNoteListener onNoteListener) {
+    public PostAdapter(List<Post> itemList, Context context,OnNoteListener onNoteListener) {
         this.itemList = itemList;
         this.context = context;
         this.mOnNoteListener=onNoteListener;
@@ -41,7 +35,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull PostAdapter.ViewHolder holder, int position) {
-        posts ne=itemList.get(position);
+        Post ne=itemList.get(position);
         holder.bind(ne);
     }
 
@@ -53,19 +47,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView textViewName;
         TextView textViewtext;
-        private posts curentitem;
+        private Post curentitem;
         OnNoteListener onNoteListener;
 
         public ViewHolder(@NonNull View itemView,OnNoteListener onNoteListener) {
             super(itemView);
-            textViewName=itemView.findViewById(R.id.book_name);
-            textViewtext=itemView.findViewById(R.id.book_author);
+            textViewName=itemView.findViewById(R.id.post_title);
+            textViewtext=itemView.findViewById(R.id.post_author);
             this.onNoteListener=onNoteListener;
             itemView.setOnClickListener(this);
 
         }
 
-        void bind (posts item) {
+        void bind (Post item) {
             textViewName.setText(item.getHeading());
             textViewtext.setText(item.getText());
             curentitem=item;
@@ -76,10 +70,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
     }
     public interface OnNoteListener{
-        void onNoteClick(posts it);
+        void onNoteClick(Post it);
     }
 
-    public void filterList(List<posts> filteredList) {
+    public void filterList(List<Post> filteredList) {
         itemList = filteredList;
         notifyDataSetChanged();
     }
