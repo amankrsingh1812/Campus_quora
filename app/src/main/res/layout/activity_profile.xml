@@ -1,12 +1,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:background="#1b1b1b"
     android:padding="@dimen/fui_auth_method_button_drawablePadding">
 
     <TextView
         android:text="Profile"
         android:gravity="center"
+        android:textColor="#ffa31a"
         style="@style/FirebaseUI.Text.Heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
@@ -21,10 +24,13 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/profileNameEditText"
         android:layout_height="wrap_content"
+        android:background="#808080"
         android:layout_width="match_parent" >
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textColorHint="#ffffff"
             android:hint="@string/fui_name_hint"
             android:inputType="textPersonName" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -32,10 +38,13 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/profileEmailEditText"
         android:layout_width="match_parent"
+        android:background="#808080"
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textColorHint="#ffffff"
             android:hint="@string/fui_email_hint"
             android:inputType="textEmailAddress" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -43,10 +52,13 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/profilePhoneEditText"
         android:layout_width="match_parent"
+        android:background="#808080"
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textColorHint="#ffffff"
             android:hint="@string/fui_phone_hint"
             android:inputType="phone"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -54,10 +66,13 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/profileBioEditText"
         android:layout_width="match_parent"
+        android:background="#808080"
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textColorHint="#ffffff"
             android:hint="@string/profile_bio_hint"
             android:inputType="text"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -68,6 +83,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:background="#ffa31a"
+        android:textColor="#1b1b1b"
         android:text="@string/update_button"
         android:onClick="updateData" />
 

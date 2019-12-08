@@ -17,23 +17,9 @@ public class User {
     public User() {
     }
 
-    public User(String Uid, String email, String name, String mobile, String profilePic, String bio) {
+    public User(String Uid, String email) {
         this.Uid = Uid;
         this.email = email;
-        this.name = name;
-        this.mobile = mobile;
-        this.profilePic = profilePic;
-        this.bio = bio;
-    }
-
-    public User(User user) {
-        Uid = user.Uid;
-        email = user.email;
-        name = user.name;
-        mobile = user.mobile;
-        profilePic = user.profilePic;
-        bio = user.bio;
-        profilePic = user.profilePic;
     }
 
     public static String getFieldProfilePic() {
@@ -54,6 +40,30 @@ public class User {
 
     public static String getFieldBio() {
         return FIELD_BIO;
+    }
+
+    public void setUid(String uid) {
+        Uid = uid;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public String getUid() {

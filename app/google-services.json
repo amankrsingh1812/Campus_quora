@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "60967470327-6826penr1thdkm4sif4rnj5l5edhpumt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.campusquora",
+            "certificate_hash": "b00edd24dc319ccefbf2cb0c5a6cfa868276baa4"
+          }
+        },
+        {
           "client_id": "60967470327-23rurmu5lld1nd9950tfmna2ft7b6596.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

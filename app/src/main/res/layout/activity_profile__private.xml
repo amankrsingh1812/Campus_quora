@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#1b1b1b"
+    android:padding="@dimen/fui_auth_method_button_drawablePadding">
+
+    <TextView
+        android:text="Profile"
+        android:gravity="center"
+        android:textColor="#ffa31a"
+        style="@style/FirebaseUI.Text.Heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/ic_profile_pic_default"
+        android:layout_gravity="center"
+        android:background="#91A3B0"/>
+
+    <TextView
+        android:id="@+id/profileNameText"
+        android:layout_marginTop="20dp"
+        android:layout_height="40dp"
+        android:textSize="22sp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:textColor="#ffffff"
+        android:textColorHint="#ffffff"
+        android:hint="@string/fui_name_hint"/>
+    <TextView
+        android:id="@+id/profileBioHeadingText"
+        android:layout_marginTop="20dp"
+        android:layout_height="40dp"
+        android:textSize="22sp"
+        android:layout_width="match_parent"
+        android:textColor="#ffa31a"
+        android:text="BIO"/>
+
+
+    <TextView
+        android:id="@+id/profileBioText"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:textSize="18sp"
+        android:background="#292929"
+        android:textColor="#ffffff"
+        android:textColorHint="#ffffff"
+        android:hint="@string/profile_bio_hint"
+        android:inputType="text"/>
+
+</LinearLayout>

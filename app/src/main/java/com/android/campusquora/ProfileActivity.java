@@ -21,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -62,11 +63,15 @@ public class ProfileActivity extends AppCompatActivity {
 
     public void updateData(View view) {
         String profilePic = mProfilePicAddress;
-        String name = mProfileNameEditText.getEditText().getText().toString();
-        String email = mProfileEmailEditText.getEditText().getText().toString();
-        String mobile = mProfilePhoneEditText.getEditText().getText().toString();
-        String bio = mProfileBioEditText.getEditText().getText().toString();
-        User userData = new User(mCurrentUser.getUid(), email, name, mobile, profilePic, bio);
+        String name = Objects.requireNonNull(mProfileNameEditText.getEditText()).getText().toString();
+        String email = Objects.requireNonNull(mProfileEmailEditText.getEditText()).getText().toString();
+        String mobile = Objects.requireNonNull(mProfilePhoneEditText.getEditText()).getText().toString();
+        String bio = Objects.requireNonNull(mProfileBioEditText.getEditText()).getText().toString();
+        User userData = new User(mCurrentUser.getUid(), email);
+        userData.setName(name);
+        userData.setMobile(mobile);
+        userData.setProfilePic(profilePic);
+        userData.setBio(bio);
         updateUserDetailsOnFirestore(userData);
         finish();
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
