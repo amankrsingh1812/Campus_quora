@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -28,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.hootsuite.nachos.NachoTextView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,12 +52,19 @@ public class NewPost extends AppCompatActivity {
     private ImageView imageView;
     private String postId;
     private Uri filePath;
-
     private final int PICK_IMAGE_REQUEST = 71;
+    private NachoTextView nachoTextView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_post);
+        String[] suggestions = new String[]{"Tortilla Chips", "Melted Cheese", "Salsa", "Guacamole", "Mexico", "Jalapeno"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, suggestions);
+
+        nachoTextView=findViewById(R.id.spinner1);
+        nachoTextView.setAdapter(adapter);
+        super.onCreate(savedInstanceState);
         heading=findViewById(R.id.heading);
         progressDialog=new ProgressDialog(this);
         text=findViewById(R.id.text);
