@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,8 +21,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.campusquora.model.Post;
 import com.android.campusquora.model.User;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Registry;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -40,7 +46,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.Transaction;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -76,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
         newp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
                 startActivity(new Intent(getApplicationContext(), NewPost.class));
             }
             });
@@ -89,7 +96,8 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
         current_user = mAuth.getCurrentUser();
         if(current_user == null) {
-            createSignInIntent();
+            finish();
+            startActivity(new Intent(this, RegisterActivity.class));
         }
         setUpRecyclerView();
     }
@@ -255,20 +263,21 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
 
     public void signOut() {
-        // [START auth_fui_signout]
         AuthUI.getInstance()
                 .signOut(this)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
                         finish();
-                        isDestroyed();
+                        startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
                     }
                 });
-        // [END auth_fui_signout]
     }
 
     @Override
     public void onNoteClick(Post it) {
+        Intent intent = new Intent(getApplicationContext(), PostActivity.class);
+        intent.putExtra("Post", it);
+        startActivity(intent);
         Toast.makeText(MainActivity.this, "Okay", Toast.LENGTH_SHORT).show();
     }
 
@@ -378,3 +387,4 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
         });
     }
 }
+

@@ -1,21 +1,30 @@
 package com.android.campusquora;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.campusquora.model.Post;
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -25,6 +34,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private OnNoteListener mOnNoteListener;
     private int itemSelectedPosition;
     private FirebaseUser current_user;
+    QueryUtils queryUtils = new QueryUtils();
 
 
     public PostAdapter(List<Post> itemList, FirebaseUser current_user, Context context, OnNoteListener onNoteListener) {
@@ -43,8 +53,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PostAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final PostAdapter.ViewHolder holder, int position) {
         Post ne=itemList.get(position);
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("images/"+ne.getPostID()+".jpg");
+        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                String imageURL = uri.toString();
+                Glide.with(context).load(imageURL).into(holder.postImage);
+            }
+        });
         holder.bind(ne);
     }
 
@@ -63,6 +81,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         private TextView textViewName;
         private TextView textViewtext;
         private TextView voteCount;
+        private ImageView postImage;
         private ImageView upvoteButton;
         private ImageView downvoteButton;
         private Post curentitem;
@@ -73,6 +92,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             textViewName=itemView.findViewById(R.id.post_title);
             textViewtext=itemView.findViewById(R.id.post_author);
             voteCount = itemView.findViewById(R.id.vote_count);
+            postImage = itemView.findViewById(R.id.pre_image);
             upvoteButton = itemView.findViewById(R.id.vote_up_button);
             downvoteButton = itemView.findViewById(R.id.vote_down_button);
             this.onNoteListener=onNoteListener;
@@ -96,6 +116,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     }
                 }
             });
+
+//            queryUtils.setImage(context, postImage, item.getPostID());
             textViewName.setText(item.getHeading());
             textViewtext.setText(item.getText());
             long upvotes = 0;

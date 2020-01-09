@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,16 +15,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +48,7 @@ public class NewPost extends AppCompatActivity {
     FirebaseStorage storage = FirebaseStorage.getInstance();
     private Button btnChoose, btnUpload;
     private ImageView imageView;
-
+    private String postId;
     private Uri filePath;
 
     private final int PICK_IMAGE_REQUEST = 71;
@@ -65,13 +71,6 @@ public class NewPost extends AppCompatActivity {
                 chooseImage();
             }
         });
-
-//        btnUpload.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                uploadImage();
-//            }
-//        });
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,16 +81,32 @@ public class NewPost extends AppCompatActivity {
                 Map<String, Object> post=new HashMap<>();
                 post.put("Text",text.getText().toString());
                 post.put("Heading",heading.getText().toString());
-                post.put("Likes",5);
-                post.put("Dislikes",1);
+                post.put("Likes",0);
+                post.put("Dislikes",0);
                 post.put("UserID",uid);
                postref.add(post).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
-                                Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+                                postId = documentReference.getId();
+                                Log.d(TAG, "DocumentSnapshot written with ID: " + postId);
                                 progressDialog.hide();
+                                try {
+                                    Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                                    byte[] data = baos.toByteArray();
+                                    final StorageReference ref = storage.getReference().child("images/" + postId + ".jpg");
+                                    UploadTask uploadTask = ref.putBytes(data);
+                                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(NewPost.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                    Toast.makeText(NewPost.this, "No Image", Toast.LENGTH_SHORT).show();
+                                }
                                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
-
                                 finish();
                             }
                         })
@@ -102,10 +117,14 @@ public class NewPost extends AppCompatActivity {
                             }
                         });
             }
-
         });
 
     }
+
+    private void uploadPost() {
+
+    }
+
     private void chooseImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
