@@ -1,5 +1,7 @@
 package com.android.campusquora.model;
 
+import com.google.firebase.Timestamp;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -11,8 +13,8 @@ public class Post implements Serializable {
     private Long downvotes;
     private Long numberOfComments;
     private ArrayList<String> tags;
-
-    public Post(String postID, String heading, String text, Long upvotes, Long downvotes, Long numberOfComments, ArrayList<String> tags){
+    private Timestamp postTime;
+    public Post(String postID, String heading, String text, Long upvotes, Long downvotes, Long numberOfComments, ArrayList<String> tags,Timestamp postTime){
         this.postID = postID;
         this.heading = heading;
         this.text = text;
@@ -20,6 +22,10 @@ public class Post implements Serializable {
         this.downvotes = downvotes;
         this.numberOfComments = numberOfComments;
         this.tags = tags;
+        this.postTime=postTime;
+    }
+    public Timestamp getPostTime() {
+        return postTime;
     }
 
     public void setUpvotes(Long upvotes) {

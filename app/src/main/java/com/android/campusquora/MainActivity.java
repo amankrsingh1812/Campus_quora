@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     private static final int DOWNLOAD_BATCH_SIZE = 10;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-//    private ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
     private ContentLoadingProgressBar postLoadingProgressBar;
     private PostAdapter adapter;
     private List<Post> itemList;
@@ -72,22 +73,27 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     FirebaseUser current_user;
     private boolean isScrolling = false;
     private boolean allPostsLoaded = false;
+    private RecyclerView recyclerView;
     LinearLayoutManager linearLayoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        progressDialog=new ProgressDialog(this);
+        progressDialog=new ProgressDialog(this);
+
         postLoadingProgressBar = findViewById(R.id.post_loading_progress_bar);
         itemList=new ArrayList<>();
         FloatingActionButton newp = findViewById(R.id.fab);
         newp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(getApplicationContext(), NewPost.class));
             }
             });
         linearLayoutManager = new LinearLayoutManager(this);
+//        setUpRecyclerView();
+
     }
 
     @Override
@@ -100,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
             startActivity(new Intent(this, RegisterActivity.class));
         }
         setUpRecyclerView();
+
     }
 
     @Override
@@ -167,11 +174,11 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
         }
     }
     private void setUpRecyclerView(){
-//        progressDialog.setMessage("Loading Posts ...");
-//        progressDialog.show();
-//        progressDialog.setCancelable(false);
-//        progressDialog.setCanceledOnTouchOutside(false);
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        progressDialog.setMessage("Loading Posts ...");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+        recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         if(current_user == null) {
@@ -180,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
         adapter=new PostAdapter(itemList, current_user,this,this);
         recyclerView.setAdapter(adapter);
+//        adapter.notifyDataSetChanged();
         itemList.clear();
         getPostsFromFirestore();
 
@@ -209,14 +217,16 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
     }
 
+
+
     private void getPostsFromFirestore() {
         if(allPostsLoaded) return;
         postLoadingProgressBar.setVisibility(View.VISIBLE);
         Query query;
         if(lastVisible != null) {
-            query = dataref.orderBy("Heading").startAfter(lastVisible).limit(DOWNLOAD_BATCH_SIZE);
+            query = dataref.orderBy("postTime").startAfter(lastVisible).limit(DOWNLOAD_BATCH_SIZE);
         } else {
-            query = dataref.orderBy("Heading").limit(DOWNLOAD_BATCH_SIZE);
+            query = dataref.orderBy("postTime").limit(DOWNLOAD_BATCH_SIZE);
         }
 
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -236,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
                             if (tempObject != null) {
                                 postText = tempObject.toString();
                             }
-                            itemList.add(new Post(documentSnapshot.getId(), postHeading, postText, documentSnapshot.getLong("Likes"), documentSnapshot.getLong("Dislikes"), documentSnapshot.getLong("NumberOfComments"), (ArrayList<String>) documentSnapshot.get("Tags")));
+                            itemList.add(new Post(documentSnapshot.getId(), postHeading, postText, documentSnapshot.getLong("Likes"), documentSnapshot.getLong("Dislikes"), documentSnapshot.getLong("NumberOfComments"), (ArrayList<String>) documentSnapshot.get("Tags"),documentSnapshot.getTimestamp("postTime")));
                         }
                         if (querySnapshot.getDocuments().size() > 0) {
                             lastVisible = querySnapshot.getDocuments().get(task.getResult().getDocuments().size() - 1);
@@ -247,12 +257,12 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
                     }
                     adapter.notifyDataSetChanged();
                     adapter.filterList(itemList);
-//                    progressDialog.hide();
+                    progressDialog.hide();
 
                 }
                 else{
                     String error= Objects.requireNonNull(task.getException()).getMessage();
-//                    progressDialog.hide();
+                    progressDialog.hide();
                     Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT).show();
                 }
 //                bar.dismiss();
@@ -261,6 +271,12 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
         postLoadingProgressBar.setVisibility(View.INVISIBLE);
     }
 
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        setUpRecyclerView();
+//    }
 
     public void signOut() {
         AuthUI.getInstance()

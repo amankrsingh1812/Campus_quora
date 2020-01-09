@@ -85,6 +85,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         private ImageView upvoteButton;
         private ImageView downvoteButton;
         private Post curentitem;
+        //private Post postTime;
+        private TextView timeview;
         OnNoteListener onNoteListener;
 
         public ViewHolder(@NonNull View itemView,OnNoteListener onNoteListener) {
@@ -95,6 +97,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             postImage = itemView.findViewById(R.id.pre_image);
             upvoteButton = itemView.findViewById(R.id.vote_up_button);
             downvoteButton = itemView.findViewById(R.id.vote_down_button);
+            timeview = itemView.findViewById(R.id.book_time);
             this.onNoteListener=onNoteListener;
             itemView.setOnClickListener(this);
         }
@@ -120,6 +123,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 //            queryUtils.setImage(context, postImage, item.getPostID());
             textViewName.setText(item.getHeading());
             textViewtext.setText(item.getText());
+            timeview.setText(item.getPostTime().toDate().toString());
             long upvotes = 0;
             long downvotes = 0;
             if(item.getUpvotes() != null) {

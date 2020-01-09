@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -33,6 +34,7 @@ import com.hootsuite.nachos.NachoTextView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,7 +53,11 @@ public class NewPost extends AppCompatActivity {
     private Button btnChoose, btnUpload;
     private ImageView imageView;
     private String postId;
+    private Timestamp ptime;
     private Uri filePath;
+
+    private Date date;
+
     private final int PICK_IMAGE_REQUEST = 71;
     private NachoTextView nachoTextView;
 
@@ -66,10 +72,13 @@ public class NewPost extends AppCompatActivity {
         nachoTextView.setAdapter(adapter);
         super.onCreate(savedInstanceState);
         heading=findViewById(R.id.heading);
-        progressDialog=new ProgressDialog(this);
-        text=findViewById(R.id.text);
+        progressDialog = new ProgressDialog(this);
+        text = findViewById(R.id.text);
 //        user=mauth.getCurrentUser();
-        uid="fdgjjhh654876";
+        uid = "fdgjjhh654876";
+        date = new Date();
+        ptime = new Timestamp(date);
+
         add=findViewById(R.id.post_button);
         btnChoose = (Button) findViewById(R.id.btnChoose);
 //        btnUpload = (Button) findViewById(R.id.btnUpload);
@@ -93,6 +102,7 @@ public class NewPost extends AppCompatActivity {
                 post.put("Likes",0);
                 post.put("Dislikes",0);
                 post.put("UserID",uid);
+                post.put("postTime",ptime);
                postref.add(post).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
@@ -115,8 +125,8 @@ public class NewPost extends AppCompatActivity {
                                 } catch (Exception e) {
                                     Toast.makeText(NewPost.this, "No Image", Toast.LENGTH_SHORT).show();
                                 }
-                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
                                 finish();
+                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -130,8 +140,11 @@ public class NewPost extends AppCompatActivity {
 
     }
 
-    private void uploadPost() {
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 
     private void chooseImage() {
