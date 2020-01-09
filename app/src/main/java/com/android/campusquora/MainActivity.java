@@ -56,7 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements PostAdapter.OnNoteListener {
+public class MainActivity extends AppCompatActivity implements PostAdapter.OnNoteListener  {
 
     private static final int DOWNLOAD_BATCH_SIZE = 10;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     private List<Post> itemList;
     private CollectionReference dataref= FirebaseFirestore.getInstance().collection("Posts");
     private CollectionReference userref = FirebaseFirestore.getInstance().collection("Users");
+    private CollectionReference tagref = FirebaseFirestore.getInstance().collection("Tags");
+
     private DocumentSnapshot lastVisible = null;
     private static final int RC_SIGN_IN = 123;
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -74,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     private boolean isScrolling = false;
     private boolean allPostsLoaded = false;
     private RecyclerView recyclerView;
+    private List<String> list;
+    private Intent i;
     LinearLayoutManager linearLayoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,15 +87,36 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
         postLoadingProgressBar = findViewById(R.id.post_loading_progress_bar);
         itemList=new ArrayList<>();
+        list=new ArrayList<String>();
         FloatingActionButton newp = findViewById(R.id.fab);
+//        newp.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//                startActivity(new Intent(getApplicationContext(), NewPost.class));
+//            }
+//            });
         newp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
-                startActivity(new Intent(getApplicationContext(), NewPost.class));
-            }
-            });
-        linearLayoutManager = new LinearLayoutManager(this);
+                tagref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                list.add((String)documentSnapshot.getId());
+                            }
+                            if(list.isEmpty())
+                                Toast.makeText(MainActivity.this, "fOkay", Toast.LENGTH_SHORT).show();
+                            i=new Intent(getApplicationContext(), NewPost.class);
+                            i.putStringArrayListExtra("list",(ArrayList<String>)list);
+                            finish();
+                            startActivity(i);
+                        }
+                    }}
+                );}});
+
+                linearLayoutManager = new LinearLayoutManager(this);
 //        setUpRecyclerView();
 
     }
@@ -293,8 +318,10 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     public void onNoteClick(Post it) {
         Intent intent = new Intent(getApplicationContext(), PostActivity.class);
         intent.putExtra("Post", it);
+
+//        Toast.makeText(MainActivity.this, "Okay", Toast.LENGTH_SHORT).show();
         startActivity(intent);
-        Toast.makeText(MainActivity.this, "Okay", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private int hasVoted(String postID, Transaction transaction) {

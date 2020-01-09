@@ -31,9 +31,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.hootsuite.nachos.NachoTextView;
+import com.hootsuite.nachos.chip.Chip;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,19 +56,24 @@ public class NewPost extends AppCompatActivity {
     private ImageView imageView;
     private String postId;
     private Timestamp ptime;
+    private ArrayList<String> tags;
+
     private Uri filePath;
 
     private Date date;
 
     private final int PICK_IMAGE_REQUEST = 71;
     private NachoTextView nachoTextView;
+    private ArrayList<String> list =  new ArrayList<String>();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_new_post);
-        String[] suggestions = new String[]{"Tortilla Chips", "Melted Cheese", "Salsa", "Guacamole", "Mexico", "Jalapeno"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, suggestions);
+//        String[] suggestions = new String[]{"Tortilla Chips", "Melted Cheese", "Salsa", "Guacamole", "Mexico", "Jalapeno"};
+        list=getIntent().getStringArrayListExtra("list");
+//        Toast.makeText(NewPost.this, list.get(0), Toast.LENGTH_SHORT).show();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, list);
 
         nachoTextView=findViewById(R.id.spinner1);
         nachoTextView.setAdapter(adapter);
@@ -78,6 +85,7 @@ public class NewPost extends AppCompatActivity {
         uid = "fdgjjhh654876";
         date = new Date();
         ptime = new Timestamp(date);
+        tags=new ArrayList<String>();
 
         add=findViewById(R.id.post_button);
         btnChoose = (Button) findViewById(R.id.btnChoose);
@@ -96,7 +104,12 @@ public class NewPost extends AppCompatActivity {
                 progressDialog.show();
                 progressDialog.setCancelable(false);
                 progressDialog.setCanceledOnTouchOutside(false);
+                for (Chip chip : nachoTextView.getAllChips()) {
+                    // Do something with the text of each chip
+                    tags.add((String)chip.getText());
+                }
                 Map<String, Object> post=new HashMap<>();
+                post.put("Tags",tags);
                 post.put("Text",text.getText().toString());
                 post.put("Heading",heading.getText().toString());
                 post.put("Likes",0);

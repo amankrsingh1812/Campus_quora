@@ -2,6 +2,7 @@ package com.android.campusquora;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,5 +24,11 @@ public class PostActivity extends AppCompatActivity {
         postContent.setText(post.getText());
         final ImageView postImage = findViewById(R.id.post_image);
         queryUtils.setImage(this, postImage, post.getPostID());
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 }
