@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
                             if (tempObject != null) {
                                 postText = tempObject.toString();
                             }
-                            itemList.add(new Post(documentSnapshot.getId(), postHeading, postText, documentSnapshot.getLong("Likes"), documentSnapshot.getLong("Dislikes"), documentSnapshot.getLong("NumberOfComments"), (ArrayList<String>) documentSnapshot.get("Tags"),documentSnapshot.getLong("postTime")));
+                            itemList.add(new Post(documentSnapshot.getId(), postHeading, postText, documentSnapshot.getLong("Likes"), documentSnapshot.getLong("Dislikes"), documentSnapshot.getLong("NumberOfComments"), (ArrayList<String>) documentSnapshot.get("Tags"),documentSnapshot.getLong("postTime"), documentSnapshot.getString("imageURL")));
                         }
                         if (querySnapshot.getDocuments().size() > 0) {
                             lastVisible = querySnapshot.getDocuments().get(task.getResult().getDocuments().size() - 1);
@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
                     transaction.delete(hasVotedRef);
                 }
                 Log.v(LOG_TAG, "After: it.getUp, it.getDown: " + it.getUpvotes() + ", " + it.getDownvotes());
-                transaction.update(postRef, "Dilikes", it.getDownvotes(), "Likes", it.getUpvotes());
+                transaction.update(postRef, "Dislikes", it.getDownvotes(), "Likes", it.getUpvotes());
                 return null;
             }
         }).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -420,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
                     it.setUpvotes(it.getUpvotes() - 1);
                 }
                 Log.v(LOG_TAG, "After: it.getUp, it.getDown: " + it.getUpvotes() + ", " + it.getDownvotes());
-                transaction.update(postRef, "Dilikes", it.getDownvotes(), "Likes", it.getUpvotes());
+                transaction.update(postRef, "Dislikes", it.getDownvotes(), "Likes", it.getUpvotes());
                 return null;
             }
         }).addOnSuccessListener(new OnSuccessListener<Void>() {

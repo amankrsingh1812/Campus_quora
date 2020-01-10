@@ -16,7 +16,8 @@ public class Post implements Serializable {
     private Long numberOfComments;
     private ArrayList<String> tags;
     private Long postTime;
-    public Post(String postID, String heading, String text, Long upvotes, Long downvotes, Long numberOfComments, ArrayList<String> tags,Long postTime){
+    private String imageUrl;
+    public Post(String postID, String heading, String text, Long upvotes, Long downvotes, Long numberOfComments, ArrayList<String> tags,Long postTime, String imageUrl){
         this.postID = postID;
         this.heading = heading;
         this.text = text;
@@ -24,7 +25,8 @@ public class Post implements Serializable {
         this.downvotes = downvotes;
         this.numberOfComments = numberOfComments;
         this.tags = tags;
-        this.postTime=postTime;
+        this.postTime = postTime;
+        this.imageUrl = imageUrl;
     }
 
     public void setUpvotes(Long upvotes) {
@@ -62,6 +64,10 @@ public class Post implements Serializable {
     public String getPostTime() {
         Timestamp timestamp = new Timestamp(postTime);
         return timestamp.toString();
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     public Long getNumberOfComments() {
