@@ -148,56 +148,56 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
         return super.onOptionsItemSelected(item);
     }
 
-    public void createSignInIntent() {
-        // [START auth_fui_create_intent]
-        // Choose authentication providers
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.GoogleBuilder().build(),
-                new AuthUI.IdpConfig.EmailBuilder().build());
-
-        // Create and launch sign-in intent
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);
-        // [END auth_fui_create_intent]
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            if (resultCode == RESULT_OK) {
-                // Successfully signed in
-                current_user = FirebaseAuth.getInstance().getCurrentUser();
-                userref.document(current_user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if(document == null || !document.exists()) {
-                                HashMap<String, Object> userData = new HashMap<>();
-                                userData.put(User.getFieldEmail(), current_user.getEmail());
-                                userref.document(current_user.getUid()).set(userData, SetOptions.merge());
-                            } else {
-                                Toast.makeText(MainActivity.this, "Welcome back, " + current_user.getEmail(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
-                });
-                // ...
-            } else {
-                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    public void createSignInIntent() {
+//        // [START auth_fui_create_intent]
+//        // Choose authentication providers
+//        List<AuthUI.IdpConfig> providers = Arrays.asList(
+//                new AuthUI.IdpConfig.GoogleBuilder().build(),
+//                new AuthUI.IdpConfig.EmailBuilder().build());
+//
+//        // Create and launch sign-in intent
+//        startActivityForResult(
+//                AuthUI.getInstance()
+//                        .createSignInIntentBuilder()
+//                        .setAvailableProviders(providers)
+//                        .build(),
+//                RC_SIGN_IN);
+//        // [END auth_fui_create_intent]
+//    }
+//
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        if (requestCode == RC_SIGN_IN) {
+//            IdpResponse response = IdpResponse.fromResultIntent(data);
+//
+//            if (resultCode == RESULT_OK) {
+//                // Successfully signed in
+//                current_user = FirebaseAuth.getInstance().getCurrentUser();
+//                userref.document(current_user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        if(task.isSuccessful()) {
+//                            DocumentSnapshot document = task.getResult();
+//                            if(document == null || !document.exists()) {
+//                                HashMap<String, Object> userData = new HashMap<>();
+//                                userData.put(User.getFieldEmail(), current_user.getEmail());
+//                                userref.document(current_user.getUid()).set(userData, SetOptions.merge());
+//                            } else {
+//                                Toast.makeText(MainActivity.this, "Welcome back, " + current_user.getEmail(), Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+//                    }
+//                });
+//                // ...
+//            } else {
+//                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+//            }
+//        } else {
+//            Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+//        }
+//    }
     private void setUpRecyclerView(){
         progressDialog.setMessage("Loading Posts ...");
         progressDialog.show();
@@ -207,7 +207,8 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         if(current_user == null) {
-            createSignInIntent();
+            finish();
+            startActivity(new Intent(this, RegisterActivity.class));
         }
 
         adapter=new PostAdapter(itemList, current_user,this,this);
