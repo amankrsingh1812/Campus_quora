@@ -55,7 +55,7 @@ public class NewPost extends AppCompatActivity {
     private Button btnChoose, btnUpload;
     private ImageView imageView;
     private String postId;
-    private Timestamp ptime;
+    private Long ptime;
     private ArrayList<String> tags;
 
     private Uri filePath;
@@ -84,7 +84,7 @@ public class NewPost extends AppCompatActivity {
 //        user=mauth.getCurrentUser();
         uid = "fdgjjhh654876";
         date = new Date();
-        ptime = new Timestamp(date);
+        ptime = date.getTime();
         tags=new ArrayList<String>();
 
         add=findViewById(R.id.post_button);

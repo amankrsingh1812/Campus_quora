@@ -271,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
                             if (tempObject != null) {
                                 postText = tempObject.toString();
                             }
-                            itemList.add(new Post(documentSnapshot.getId(), postHeading, postText, documentSnapshot.getLong("Likes"), documentSnapshot.getLong("Dislikes"), documentSnapshot.getLong("NumberOfComments"), (ArrayList<String>) documentSnapshot.get("Tags"),documentSnapshot.getTimestamp("postTime")));
+                            itemList.add(new Post(documentSnapshot.getId(), postHeading, postText, documentSnapshot.getLong("Likes"), documentSnapshot.getLong("Dislikes"), documentSnapshot.getLong("NumberOfComments"), (ArrayList<String>) documentSnapshot.get("Tags"),documentSnapshot.getLong("postTime")));
                         }
                         if (querySnapshot.getDocuments().size() > 0) {
                             lastVisible = querySnapshot.getDocuments().get(task.getResult().getDocuments().size() - 1);

@@ -123,7 +123,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 //            queryUtils.setImage(context, postImage, item.getPostID());
             textViewName.setText(item.getHeading());
             textViewtext.setText(item.getText());
-            timeview.setText(item.getPostTime().toDate().toString());
+            timeview.setText(item.getPostTime());
             long upvotes = 0;
             long downvotes = 0;
             if(item.getUpvotes() != null) {
