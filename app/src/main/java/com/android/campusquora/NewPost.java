@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -35,6 +36,8 @@ import com.hootsuite.nachos.chip.Chip;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,7 +58,7 @@ public class NewPost extends AppCompatActivity {
     private Button btnChoose, btnUpload;
     private ImageView imageView;
     private String postId;
-    private Timestamp ptime;
+    private Long ptime;
     private ArrayList<String> tags;
 
     private Uri filePath;
@@ -84,7 +87,7 @@ public class NewPost extends AppCompatActivity {
 //        user=mauth.getCurrentUser();
         uid = "fdgjjhh654876";
         date = new Date();
-        ptime = new Timestamp(date);
+        ptime = date.getTime();
         tags=new ArrayList<String>();
 
         add=findViewById(R.id.post_button);
@@ -100,6 +103,10 @@ public class NewPost extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog.setMessage("Uploading Posts ...");
+                progressDialog.show();
+                progressDialog.setCancelable(false);
+                progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.setMessage("Posting...");
                 progressDialog.show();
                 progressDialog.setCancelable(false);
@@ -108,7 +115,7 @@ public class NewPost extends AppCompatActivity {
                     // Do something with the text of each chip
                     tags.add((String)chip.getText());
                 }
-                Map<String, Object> post=new HashMap<>();
+                final Map<String, Object> post=new HashMap<>();
                 post.put("Tags",tags);
                 post.put("Text",text.getText().toString());
                 post.put("Heading",heading.getText().toString());
@@ -116,38 +123,60 @@ public class NewPost extends AppCompatActivity {
                 post.put("Dislikes",0);
                 post.put("UserID",uid);
                 post.put("postTime",ptime);
-               postref.add(post).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                postId = documentReference.getId();
-                                Log.d(TAG, "DocumentSnapshot written with ID: " + postId);
-                                progressDialog.hide();
-                                try {
-                                    Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                                    byte[] data = baos.toByteArray();
-                                    final StorageReference ref = storage.getReference().child("images/" + postId + ".jpg");
-                                    UploadTask uploadTask = ref.putBytes(data);
-                                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                postref.add(post).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        postId = documentReference.getId();
+                        Log.d(TAG, "DocumentSnapshot written with ID: " + postId);
+                        try {
+                            Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                            byte[] data = baos.toByteArray();
+                            final StorageReference ref = storage.getReference().child("images/" + postId + ".jpg");
+                            UploadTask uploadTask = ref.putBytes(data);
+                            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                         @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(NewPost.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        public void onSuccess(Uri uri) {
+                                            post.put("imageURL", uri.toString());
+                                            postref.document(postId).set(post).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(NewPost.this, "Post Uploaded With Image", Toast.LENGTH_SHORT).show();
+                                                    progressDialog.dismiss();
+                                                    finish();
+                                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                                }
+                                            });
                                         }
                                     });
-                                } catch (Exception e) {
-                                    Toast.makeText(NewPost.this, "No Image", Toast.LENGTH_SHORT).show();
                                 }
-                                finish();
-                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Error adding document", e);
-                            }
-                        });
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(NewPost.this, "Post Not Uploaded", Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
+                                    Toast.makeText(NewPost.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } catch (Exception e) {
+                            Toast.makeText(NewPost.this, "Post Upload without Image", Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
+                            finish();
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(NewPost.this, "Error Adding Document", Toast.LENGTH_SHORT).show();
+                        Log.w(TAG, "Error adding document", e);
+                        progressDialog.dismiss();
+                    }
+                });
             }
         });
 

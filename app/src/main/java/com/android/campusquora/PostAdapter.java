@@ -22,11 +22,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private List<Post> itemList;
@@ -55,14 +58,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final PostAdapter.ViewHolder holder, int position) {
         Post ne=itemList.get(position);
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("images/"+ne.getPostID()+".jpg");
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                String imageURL = uri.toString();
-                Glide.with(context).load(imageURL).into(holder.postImage);
-            }
-        });
         holder.bind(ne);
     }
 
@@ -70,6 +65,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public int getItemCount() {
         return itemList.size();
     }
+
+                            
 
     public void updatePost(Post it) {
         itemList.get(itemSelectedPosition).setUpvotes(it.getUpvotes());
@@ -102,7 +99,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             itemView.setOnClickListener(this);
         }
 
-        void bind (Post item) {
+        void bind (final Post item) {
             DocumentReference hasVotedRef = FirebaseFirestore.getInstance().collection("Users").document(current_user.getUid()).collection("hasVoted").document(item.getPostID());
             hasVotedRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
@@ -120,10 +117,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 }
             });
 
+            Picasso.with(context).load(item.getImageUrl()).into(postImage);
+
 //            queryUtils.setImage(context, postImage, item.getPostID());
             textViewName.setText(item.getHeading());
             textViewtext.setText(item.getText());
-            timeview.setText(item.getPostTime().toDate().toString());
+            timeview.setText(item.getPostTime());
             long upvotes = 0;
             long downvotes = 0;
             if(item.getUpvotes() != null) {
