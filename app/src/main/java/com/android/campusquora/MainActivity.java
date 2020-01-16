@@ -298,11 +298,11 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     }
 
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        setUpRecyclerView();
-//    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
+    }
 
     public void signOut() {
         AuthUI.getInstance()

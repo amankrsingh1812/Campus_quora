@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,7 +118,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 }
             });
 
-            Picasso.with(context).load(item.getImageUrl()).into(postImage);
+            Picasso.with(context).load(item.getImageUrl()).fit().centerCrop().into(postImage);
+            Log.v(PostAdapter.class.getSimpleName(), "" + item.getHeading() + ": " + item.getImageUrl());
 
 //            queryUtils.setImage(context, postImage, item.getPostID());
             textViewName.setText(item.getHeading());

@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -123,63 +124,85 @@ public class NewPost extends AppCompatActivity {
                 post.put("Dislikes",0);
                 post.put("UserID",uid);
                 post.put("postTime",ptime);
-                postref.add(post).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        postId = documentReference.getId();
-                        Log.d(TAG, "DocumentSnapshot written with ID: " + postId);
-                        try {
-                            Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                            byte[] data = baos.toByteArray();
-                            final StorageReference ref = storage.getReference().child("images/" + postId + ".jpg");
-                            UploadTask uploadTask = ref.putBytes(data);
-                            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                QueryUtils queryUtils = new QueryUtils();
+                final String postId = queryUtils.generateUniqueId();
+                Bitmap bitmap;
+                try {
+                    bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                } catch (Exception e) {
+                    bitmap = null;
+                }
+                if(bitmap != null) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                    byte[] data = baos.toByteArray();
+                    final StorageReference ref = storage.getReference().child("images/" + postId + ".jpg");
+                    UploadTask uploadTask = ref.putBytes(data);
+                    Task<Uri> uriTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                        @Override
+                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                            if (!task.isSuccessful()) {
+                                throw task.getException();
+                            }
+                            return ref.getDownloadUrl();
+                        }
+                    }).addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String imageURL = null;
+                            if (uri != null) {
+                                imageURL = uri.toString();
+                            }
+                            post.put("imageURL", imageURL);
+                            postref.document(postId).set(post).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-                                            post.put("imageURL", uri.toString());
-                                            postref.document(postId).set(post).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Toast.makeText(NewPost.this, "Post Uploaded With Image", Toast.LENGTH_SHORT).show();
-                                                    progressDialog.dismiss();
-                                                    finish();
-                                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                                                }
-                                            });
-                                        }
-                                    });
+                                public void onSuccess(Void aVoid) {
+                                    finish();
+                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(NewPost.this, "Post Not Uploaded", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(NewPost.this, "Error Adding Document", Toast.LENGTH_SHORT).show();
+                                    Log.w(TAG, "Error adding document", e);
                                     progressDialog.dismiss();
-                                    Toast.makeText(NewPost.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             });
-                        } catch (Exception e) {
-                            Toast.makeText(NewPost.this, "Post Upload without Image", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(NewPost.this, "Error Adding Document", Toast.LENGTH_SHORT).show();
+                            Log.w(TAG, "Error adding document", e);
                             progressDialog.dismiss();
+                        }
+                    });
+                } else {
+                    postref.document(postId).set(post).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
                             finish();
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(NewPost.this, "Error Adding Document", Toast.LENGTH_SHORT).show();
-                        Log.w(TAG, "Error adding document", e);
-                        progressDialog.dismiss();
-                    }
-                });
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(NewPost.this, "Error Adding Document", Toast.LENGTH_SHORT).show();
+                            Log.w(TAG, "Error adding document", e);
+                            progressDialog.dismiss();
+                        }
+                    });
+                }
+
             }
         });
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
     }
 
     @Override

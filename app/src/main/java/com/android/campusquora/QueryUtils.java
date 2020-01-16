@@ -17,10 +17,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Random;
 
 class QueryUtils {
 
@@ -48,6 +50,16 @@ class QueryUtils {
         }
     }
 
+    String generateUniqueId() {
+        Random random = new Random();
+        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder unique_id = new StringBuilder();
+        for(int i = 0; i < 20; ++i) {
+            unique_id.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return unique_id.toString();
+    }
+
     void setImage(final Context context, final ImageView imageView, String postId) {
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("images/"+postId+".jpg");
 //        storageReference.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
@@ -66,7 +78,7 @@ class QueryUtils {
             @Override
             public void onSuccess(Uri uri) {
                 String imageURL = uri.toString();
-                Glide.with(context).load(imageURL).into(imageView);
+                Picasso.with(context).load(imageURL).fit().centerCrop().into(imageView);
             }
         });
         Glide.with(context).load(storageReference).into(imageView);

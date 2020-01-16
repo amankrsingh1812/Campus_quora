@@ -100,7 +100,8 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Login Failed", Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Login Failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Login Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
         }
     }

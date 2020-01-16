@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "60967470327-n2jh981ck97b752d3lgks0b3sjbb0a4t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.campusquora",
+            "certificate_hash": "38c5ec5ceae7b878b6122c0b14bb2983b5a809b9"
+          }
+        },
+        {
+          "client_id": "60967470327-fp60jvs6ktvs4o6o2brork5s5fa7kf1g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.campusquora",
+            "certificate_hash": "7a43a5a9417752820779f1ae0f8d6d33f8061ca5"
+          }
+        },
+        {
           "client_id": "60967470327-6826penr1thdkm4sif4rnj5l5edhpumt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
