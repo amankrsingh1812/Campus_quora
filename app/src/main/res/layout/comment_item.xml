@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryDark"
+    android:elevation="4sp"
+    android:id="@+id/abc"
+    android:clickable="true"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/comment_author"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:text="Name"
+        android:textSize="16sp"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/seperator_0003"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="8dp"
+        android:text=" | "
+        android:textColor="@color/colorLightGrey"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/comment_author"
+        app:layout_constraintTop_toTopOf="@+id/comment_author" />
+    <TextView
+        android:id="@+id/comment_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="8dp"
+        android:text="time"
+        android:textColor="@color/colorLightGrey"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/seperator_0003"
+        app:layout_constraintTop_toTopOf="@+id/comment_author" />
+    <TextView
+        android:id="@+id/actual_comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/colorWhite"
+        android:background="@color/colorPrimary"
+        android:text="The Comment which for this example is very looooooooooooo oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong"
+        app:layout_constraintStart_toStartOf="@+id/comment_author"
+        app:layout_constraintTop_toBottomOf="@+id/comment_author"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <ImageButton
+        android:id="@+id/upvote_image_button"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintTop_toBottomOf="@id/actual_comment"
+        app:layout_constraintStart_toStartOf="@id/comment_author"
+        android:src="@mipmap/vote_up_gray"
+        />
+    <ImageButton
+        android:id="@+id/downvote_image_button"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="6dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintTop_toBottomOf="@id/actual_comment"
+        app:layout_constraintStart_toEndOf='@id/upvote_image_button'
+        android:src="@mipmap/vote_down_gray"
+        />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorLightGrey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+    <LinearLayout
+        android:id="@+id/linearLayout8"
+        android:layout_width="0dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
