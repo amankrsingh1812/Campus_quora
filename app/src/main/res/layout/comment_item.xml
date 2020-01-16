@@ -22,15 +22,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
     <TextView
+        android:id="@+id/comment_score"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:text="69"
+        android:textColor="@color/colorWhite"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@id/seperator_0003"
+        app:layout_constraintTop_toTopOf="@+id/comment_author"/>
+    <TextView
         android:id="@+id/seperator_0003"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
-        android:layout_marginEnd="8dp"
         android:text=" | "
         android:textColor="@color/colorLightGrey"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@id/comment_author"
+        app:layout_constraintEnd_toStartOf="@+id/comment_time"
         app:layout_constraintTop_toTopOf="@+id/comment_author" />
     <TextView
         android:id="@+id/comment_time"
@@ -41,7 +50,7 @@
         android:text="time"
         android:textColor="@color/colorLightGrey"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@id/seperator_0003"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/comment_author" />
     <TextView
         android:id="@+id/actual_comment"
@@ -82,16 +91,6 @@
         android:background="@color/colorLightGrey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
-    <LinearLayout
-        android:id="@+id/linearLayout8"
-        android:layout_width="0dp"
-        android:layout_height="10dp"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
 
 
 
