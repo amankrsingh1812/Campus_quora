@@ -36,6 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v(LOG_TAG, "onCreate Called");
         setContentView(R.layout.activity_profile);
 
         mAuth = FirebaseAuth.getInstance();
@@ -49,10 +50,12 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        Log.v(LOG_TAG, "onStart Called");
         updateUI(mCurrentUser);
     }
 
     private void updateUI(FirebaseUser user) {
+        Log.v(LOG_TAG, "updateUI Called");
         if(user != null) {
             getDataFromFirestore(user);
         } else {
@@ -62,6 +65,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     public void updateData(View view) {
+        Log.v(LOG_TAG, "updateData Called");
         String profilePic = mProfilePicAddress;
         String name = Objects.requireNonNull(mProfileNameEditText.getEditText()).getText().toString();
         String email = Objects.requireNonNull(mProfileEmailEditText.getEditText()).getText().toString();
@@ -78,6 +82,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     void updateUserDetailsOnFirestore(User userData) {
+        Log.v(LOG_TAG, "updateUserDetailsOnFirestore Called");
         DocumentReference userDocRef = FirebaseFirestore.getInstance().document("users/" + userData.getUid());
         Map<String, Object> dataToSave = new HashMap<>();
         dataToSave.put(User.getFieldEmail(), userData.getEmail());
@@ -98,6 +103,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void getDataFromFirestore(FirebaseUser currentUser) {
+        Log.v(LOG_TAG, "getDataFromFirestore Called");
         DocumentReference userDocRef = FirebaseFirestore.getInstance().document("users/" + currentUser.getUid());
         userDocRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override

@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Log.v(LOG_TAG, "onCreate");
+        Log.v(LOG_TAG, "onCreate Called");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void sendPasswordResetEmail(String emailAddress) {
 
-        Log.v(LOG_TAG, "sendEmailPasswordRestEmail");
+        Log.v(LOG_TAG, "sendEmailPasswordRestEmail Called");
 
         if(TextUtils.isEmpty(emailAddress)) {
             Toast.makeText(getApplicationContext(), "Email Field Empty. Try Again", Toast.LENGTH_SHORT).show();
@@ -92,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loginUser() {
 
-        Log.v(LOG_TAG, "loginUser");
+        Log.v(LOG_TAG, "loginUser Called");
 
         String Email = email.getText().toString().trim();
         String Password = password.getText().toString().trim();

@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v(LOG_TAG, "onCreate Called");
         setContentView(R.layout.activity_main);
         progressDialog=new ProgressDialog(this);
 
@@ -124,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     @Override
     protected void onStart() {
         super.onStart();
+        Log.v(LOG_TAG, "onStart Called");
 
         current_user = mAuth.getCurrentUser();
         if(current_user == null) {
@@ -136,69 +138,22 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.v(LOG_TAG, "onCreateOptionsMenu Called");
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.v(LOG_TAG, "onOptionsItemSelected Called");
         if(item.getItemId() == R.id.sign_out) {
             signOut();
         }
         return super.onOptionsItemSelected(item);
     }
 
-//    public void createSignInIntent() {
-//        // [START auth_fui_create_intent]
-//        // Choose authentication providers
-//        List<AuthUI.IdpConfig> providers = Arrays.asList(
-//                new AuthUI.IdpConfig.GoogleBuilder().build(),
-//                new AuthUI.IdpConfig.EmailBuilder().build());
-//
-//        // Create and launch sign-in intent
-//        startActivityForResult(
-//                AuthUI.getInstance()
-//                        .createSignInIntentBuilder()
-//                        .setAvailableProviders(providers)
-//                        .build(),
-//                RC_SIGN_IN);
-//        // [END auth_fui_create_intent]
-//    }
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (requestCode == RC_SIGN_IN) {
-//            IdpResponse response = IdpResponse.fromResultIntent(data);
-//
-//            if (resultCode == RESULT_OK) {
-//                // Successfully signed in
-//                current_user = FirebaseAuth.getInstance().getCurrentUser();
-//                userref.document(current_user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                        if(task.isSuccessful()) {
-//                            DocumentSnapshot document = task.getResult();
-//                            if(document == null || !document.exists()) {
-//                                HashMap<String, Object> userData = new HashMap<>();
-//                                userData.put(User.getFieldEmail(), current_user.getEmail());
-//                                userref.document(current_user.getUid()).set(userData, SetOptions.merge());
-//                            } else {
-//                                Toast.makeText(MainActivity.this, "Welcome back, " + current_user.getEmail(), Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                    }
-//                });
-//                // ...
-//            } else {
-//                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-//            }
-//        } else {
-//            Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-//        }
-//    }
     private void setUpRecyclerView(){
+        Log.v(LOG_TAG, "setUpRecyclerView Called");
         progressDialog.setMessage("Loading Posts ...");
         progressDialog.show();
         progressDialog.setCancelable(false);
@@ -246,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
 
     private void getPostsFromFirestore() {
+        Log.v(LOG_TAG, "getPostsFromFirestore Called");
         if(allPostsLoaded) return;
         postLoadingProgressBar.setVisibility(View.VISIBLE);
         Query query;
@@ -301,10 +257,12 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     @Override
     protected void onPause() {
         super.onPause();
+        Log.v(LOG_TAG, "onPause Called");
         progressDialog.dismiss();
     }
 
     public void signOut() {
+        Log.v(LOG_TAG, "signOut Called");
         AuthUI.getInstance()
                 .signOut(this)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -317,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
     @Override
     public void onNoteClick(Post it) {
+        Log.v(LOG_TAG, "onNoteClick Called");
         Intent intent = new Intent(getApplicationContext(), PostActivity.class);
         intent.putExtra("Post", it);
 
@@ -326,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     }
 
     private int hasVoted(String postID, Transaction transaction) {
-        Log.v(LOG_TAG, "hasVoted");
+        Log.v(LOG_TAG, "hasVoted Called");
         int votedFlag;
         DocumentReference docRef = userref.document(current_user.getUid()).collection("hasVoted").document(postID);
         DocumentSnapshot hasVotedDoc;
@@ -349,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
     @Override
     public void onUpvoteClick(final Post it) {
-        Log.v(LOG_TAG, "onUpvoteClick");
+        Log.v(LOG_TAG, "onUpvoteClick Called");
         final DocumentReference postRef = dataref.document(it.getPostID());
         final DocumentReference hasVotedRef = userref.document(current_user.getUid()).collection("hasVoted").document(it.getPostID());
         FirebaseFirestore.getInstance().runTransaction(new Transaction.Function<Void>() {
@@ -396,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
     @Override
     public void onDownvoteClick(final Post it) {
-        Log.v(LOG_TAG, "onDownClick");
+        Log.v(LOG_TAG, "onDownClick Called");
         Toast.makeText(this, "Down", Toast.LENGTH_SHORT).show();
         final DocumentReference postRef = dataref.document(it.getPostID());
         final DocumentReference hasVotedRef = userref.document(current_user.getUid()).collection("hasVoted").document(it.getPostID());

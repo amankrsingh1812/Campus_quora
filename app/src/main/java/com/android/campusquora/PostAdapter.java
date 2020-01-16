@@ -1,36 +1,25 @@
 package com.android.campusquora;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.campusquora.model.Post;
-import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private List<Post> itemList;
@@ -38,10 +27,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private OnNoteListener mOnNoteListener;
     private int itemSelectedPosition;
     private FirebaseUser current_user;
-    QueryUtils queryUtils = new QueryUtils();
+
+    private static final String LOG_TAG = PostAdapter.class.getSimpleName();
 
 
     public PostAdapter(List<Post> itemList, FirebaseUser current_user, Context context, OnNoteListener onNoteListener) {
+        Log.v(LOG_TAG, "PostAdapter Called");
         this.itemList = itemList;
         this.current_user = current_user;
         this.context = context;
@@ -52,24 +43,28 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     @NonNull
     @Override
     public PostAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.v(LOG_TAG, "onCreateViewHolder Called");
         View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item,parent,false);
         return new ViewHolder(v,mOnNoteListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final PostAdapter.ViewHolder holder, int position) {
+        Log.v(LOG_TAG, "onBindViewHolder Called");
         Post ne=itemList.get(position);
         holder.bind(ne);
     }
 
     @Override
     public int getItemCount() {
+        Log.v(LOG_TAG, "getItemCount Called");
         return itemList.size();
     }
 
                             
 
     public void updatePost(Post it) {
+        Log.v(LOG_TAG, "updatePost Called");
         itemList.get(itemSelectedPosition).setUpvotes(it.getUpvotes());
         itemList.get(itemSelectedPosition).setDownvotes(it.getDownvotes());
         notifyDataSetChanged();
@@ -89,6 +84,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         public ViewHolder(@NonNull View itemView,OnNoteListener onNoteListener) {
             super(itemView);
+            Log.v(LOG_TAG, "ViewHolder Called");
             textViewName=itemView.findViewById(R.id.post_title);
             textViewtext=itemView.findViewById(R.id.post_author);
             voteCount = itemView.findViewById(R.id.vote_count);
@@ -101,6 +97,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
 
         void bind (final Post item) {
+            Log.v(LOG_TAG, "bind Called");
             DocumentReference hasVotedRef = FirebaseFirestore.getInstance().collection("Users").document(current_user.getUid()).collection("hasVoted").document(item.getPostID());
             hasVotedRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
@@ -150,6 +147,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
         @Override
         public void onClick(View v) {
+            Log.v(LOG_TAG, "onClick Called");
             itemSelectedPosition = getAdapterPosition();
             onNoteListener.onNoteClick(curentitem);
         }
@@ -161,6 +159,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     public void filterList(List<Post> filteredList) {
+        Log.v(LOG_TAG, "filterList Called");
         itemList = filteredList;
         notifyDataSetChanged();
     }
