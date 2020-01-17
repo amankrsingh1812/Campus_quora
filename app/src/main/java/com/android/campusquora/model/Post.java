@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Post implements Serializable {
     private String postID;

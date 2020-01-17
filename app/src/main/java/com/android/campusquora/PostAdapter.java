@@ -30,6 +30,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     private static final String LOG_TAG = PostAdapter.class.getSimpleName();
 
+    public PostAdapter() {
+
+    }
+
 
     public PostAdapter(List<Post> itemList, FirebaseUser current_user, Context context, OnNoteListener onNoteListener) {
         Log.v(LOG_TAG, "PostAdapter Called");
@@ -152,6 +156,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             onNoteListener.onNoteClick(curentitem);
         }
     }
+
     public interface OnNoteListener{
         void onNoteClick(Post it);
         void onUpvoteClick(Post it);

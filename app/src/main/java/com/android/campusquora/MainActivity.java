@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     private RecyclerView recyclerView;
     private List<String> list;
     private Intent i;
+    private QueryUtils queryUtils = new QueryUtils();
     LinearLayoutManager linearLayoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +149,8 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
         Log.v(LOG_TAG, "onOptionsItemSelected Called");
         if(item.getItemId() == R.id.sign_out) {
             signOut();
+        } else if(item.getItemId() == R.id.settings) {
+            startActivity(new Intent(this, ProfileActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -228,7 +231,13 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
                             if (tempObject != null) {
                                 postText = tempObject.toString();
                             }
-                            itemList.add(new Post(documentSnapshot.getId(), postHeading, postText, documentSnapshot.getLong("Likes"), documentSnapshot.getLong("Dislikes"), documentSnapshot.getLong("NumberOfComments"), (ArrayList<String>) documentSnapshot.get("Tags"),documentSnapshot.getLong("postTime"), documentSnapshot.getString("imageURL")));
+                            itemList.add(new Post(documentSnapshot.getId(), postHeading, postText,
+                                    documentSnapshot.getLong("Likes"),
+                                    documentSnapshot.getLong("Dislikes"),
+                                    documentSnapshot.getLong("NumberOfComments"),
+                                    (ArrayList<String>) documentSnapshot.get("Tags"),
+                                    documentSnapshot.getLong("postTime"),
+                                    documentSnapshot.getString("imageURL")));
                         }
                         if (querySnapshot.getDocuments().size() > 0) {
                             lastVisible = querySnapshot.getDocuments().get(task.getResult().getDocuments().size() - 1);
@@ -284,110 +293,14 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
         finish();
     }
 
-    private int hasVoted(String postID, Transaction transaction) {
-        Log.v(LOG_TAG, "hasVoted Called");
-        int votedFlag;
-        DocumentReference docRef = userref.document(current_user.getUid()).collection("hasVoted").document(postID);
-        DocumentSnapshot hasVotedDoc;
-        try {
-            hasVotedDoc = transaction.get(docRef);
-            Boolean upvoted = hasVotedDoc.getBoolean("upvoted");
-            if(upvoted == null) {
-                votedFlag = 0;
-            }else if(upvoted) {
-                votedFlag = 1;
-            } else {
-                votedFlag = -1;
-            }
-        } catch (FirebaseFirestoreException e) {
-            votedFlag = 0;
-        }
-        Log.v(LOG_TAG, "hasVoted() votedFlag: " + votedFlag);
-        return votedFlag;
-    }
-
     @Override
     public void onUpvoteClick(final Post it) {
-        Log.v(LOG_TAG, "onUpvoteClick Called");
-        final DocumentReference postRef = dataref.document(it.getPostID());
-        final DocumentReference hasVotedRef = userref.document(current_user.getUid()).collection("hasVoted").document(it.getPostID());
-        FirebaseFirestore.getInstance().runTransaction(new Transaction.Function<Void>() {
-            @Nullable
-            @Override
-            public Void apply(@NonNull Transaction transaction) {
-                int votedFlag = hasVoted(it.getPostID(), transaction);
-                Log.v(LOG_TAG, "onUpvoteClick: Transaction: votedFlag: " + votedFlag);
-                Log.v(LOG_TAG, "Before: it.getUp, it.getDown: " + it.getUpvotes() + ", " + it.getDownvotes());
-                if(votedFlag == -1) {
-                    it.setDownvotes(it.getDownvotes() - 1);
-                    it.setUpvotes(it.getUpvotes() + 1);
-                    transaction.update(hasVotedRef, "upvoted", true);
-                } else if(votedFlag == 0) {
-                    HashMap<String, Object> hasVotedObject = new HashMap<>();
-                    hasVotedObject.put("upvoted", true);
-                    it.setUpvotes(it.getUpvotes() + 1);
-                    transaction.set(hasVotedRef, hasVotedObject, SetOptions.merge());
-                } else {
-                     it.setUpvotes(it.getUpvotes() - 1);
-                    transaction.delete(hasVotedRef);
-                }
-                Log.v(LOG_TAG, "After: it.getUp, it.getDown: " + it.getUpvotes() + ", " + it.getDownvotes());
-                transaction.update(postRef, "Dislikes", it.getDownvotes(), "Likes", it.getUpvotes());
-                return null;
-            }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.v(LOG_TAG, "Transaction Complete");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.v(LOG_TAG, "Transaction Failed: " + e.getMessage());
-            }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                adapter.updatePost(it);
-            }
-        });
+        queryUtils.onUpvoteClick(this, dataref, it, current_user, userref, adapter);
     }
 
     @Override
     public void onDownvoteClick(final Post it) {
-        Log.v(LOG_TAG, "onDownClick Called");
-        Toast.makeText(this, "Down", Toast.LENGTH_SHORT).show();
-        final DocumentReference postRef = dataref.document(it.getPostID());
-        final DocumentReference hasVotedRef = userref.document(current_user.getUid()).collection("hasVoted").document(it.getPostID());
-        FirebaseFirestore.getInstance().runTransaction(new Transaction.Function<Void>() {
-            @Nullable
-            @Override
-            public Void apply(@NonNull Transaction transaction) {
-                int votedFlag = hasVoted(it.getPostID(), transaction);
-                Log.v(LOG_TAG, "Before: it.getUp, it.getDown: " + it.getUpvotes() + ", " + it.getDownvotes());
-                if(votedFlag == -1) {
-                    transaction.delete(hasVotedRef);
-                    it.setDownvotes(it.getDownvotes() - 1);
-                } else if(votedFlag == 0) {
-                    HashMap<String, Object> hasVotedObject = new HashMap<>();
-                    hasVotedObject.put("upvoted", false);
-                    transaction.set(hasVotedRef, hasVotedObject, SetOptions.merge());
-                    it.setDownvotes(it.getDownvotes() + 1);
-                } else {
-                    transaction.update(hasVotedRef, "upvoted", false);
-                    it.setDownvotes(it.getDownvotes() + 1);
-                    it.setUpvotes(it.getUpvotes() - 1);
-                }
-                Log.v(LOG_TAG, "After: it.getUp, it.getDown: " + it.getUpvotes() + ", " + it.getDownvotes());
-                transaction.update(postRef, "Dislikes", it.getDownvotes(), "Likes", it.getUpvotes());
-                return null;
-            }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                adapter.updatePost(it);
-            }
-        });
+        queryUtils.onDownvoteClick(this, dataref, it, current_user, userref, adapter);
     }
 }
 

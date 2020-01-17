@@ -6,6 +6,8 @@
     <dist:module dist:instant="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".PostActivity"/>
+        <activity android:name=".ProfileActivity" />
         <activity android:name=".ProfileActivity_Private" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".NewPost" android:parentActivityName=".MainActivity"/>

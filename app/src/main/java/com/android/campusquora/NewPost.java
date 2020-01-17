@@ -71,8 +71,7 @@ public class NewPost extends AppCompatActivity {
     private ArrayList<String> list =  new ArrayList<String>();
 
     private static final String LOG_TAG = NewPost.class.getSimpleName();
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(LOG_TAG, "OnCreate Called");
