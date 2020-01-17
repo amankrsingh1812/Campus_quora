@@ -78,10 +78,12 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     private RecyclerView recyclerView;
     private List<String> list;
     private Intent i;
+    private QueryUtils queryUtils = new QueryUtils();
     LinearLayoutManager linearLayoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v(LOG_TAG, "onCreate Called");
         setContentView(R.layout.activity_main);
         progressDialog=new ProgressDialog(this);
 
@@ -124,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     @Override
     protected void onStart() {
         super.onStart();
+        Log.v(LOG_TAG, "onStart Called");
 
         current_user = mAuth.getCurrentUser();
         if(current_user == null) {
@@ -136,69 +139,24 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.v(LOG_TAG, "onCreateOptionsMenu Called");
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.v(LOG_TAG, "onOptionsItemSelected Called");
         if(item.getItemId() == R.id.sign_out) {
             signOut();
+        } else if(item.getItemId() == R.id.settings) {
+            startActivity(new Intent(this, ProfileActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
 
-//    public void createSignInIntent() {
-//        // [START auth_fui_create_intent]
-//        // Choose authentication providers
-//        List<AuthUI.IdpConfig> providers = Arrays.asList(
-//                new AuthUI.IdpConfig.GoogleBuilder().build(),
-//                new AuthUI.IdpConfig.EmailBuilder().build());
-//
-//        // Create and launch sign-in intent
-//        startActivityForResult(
-//                AuthUI.getInstance()
-//                        .createSignInIntentBuilder()
-//                        .setAvailableProviders(providers)
-//                        .build(),
-//                RC_SIGN_IN);
-//        // [END auth_fui_create_intent]
-//    }
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (requestCode == RC_SIGN_IN) {
-//            IdpResponse response = IdpResponse.fromResultIntent(data);
-//
-//            if (resultCode == RESULT_OK) {
-//                // Successfully signed in
-//                current_user = FirebaseAuth.getInstance().getCurrentUser();
-//                userref.document(current_user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                        if(task.isSuccessful()) {
-//                            DocumentSnapshot document = task.getResult();
-//                            if(document == null || !document.exists()) {
-//                                HashMap<String, Object> userData = new HashMap<>();
-//                                userData.put(User.getFieldEmail(), current_user.getEmail());
-//                                userref.document(current_user.getUid()).set(userData, SetOptions.merge());
-//                            } else {
-//                                Toast.makeText(MainActivity.this, "Welcome back, " + current_user.getEmail(), Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                    }
-//                });
-//                // ...
-//            } else {
-//                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-//            }
-//        } else {
-//            Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-//        }
-//    }
     private void setUpRecyclerView(){
+        Log.v(LOG_TAG, "setUpRecyclerView Called");
         progressDialog.setMessage("Loading Posts ...");
         progressDialog.show();
         progressDialog.setCancelable(false);
@@ -246,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
 
     private void getPostsFromFirestore() {
+        Log.v(LOG_TAG, "getPostsFromFirestore Called");
         if(allPostsLoaded) return;
         postLoadingProgressBar.setVisibility(View.VISIBLE);
         Query query;
@@ -272,7 +231,13 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
                             if (tempObject != null) {
                                 postText = tempObject.toString();
                             }
-                            itemList.add(new Post(documentSnapshot.getId(), postHeading, postText, documentSnapshot.getLong("Likes"), documentSnapshot.getLong("Dislikes"), documentSnapshot.getLong("NumberOfComments"), (ArrayList<String>) documentSnapshot.get("Tags"),documentSnapshot.getLong("postTime"), documentSnapshot.getString("imageURL")));
+                            itemList.add(new Post(documentSnapshot.getId(), postHeading, postText,
+                                    documentSnapshot.getLong("Likes"),
+                                    documentSnapshot.getLong("Dislikes"),
+                                    documentSnapshot.getLong("NumberOfComments"),
+                                    (ArrayList<String>) documentSnapshot.get("Tags"),
+                                    documentSnapshot.getLong("postTime"),
+                                    documentSnapshot.getString("imageURL")));
                         }
                         if (querySnapshot.getDocuments().size() > 0) {
                             lastVisible = querySnapshot.getDocuments().get(task.getResult().getDocuments().size() - 1);
@@ -301,10 +266,12 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
     @Override
     protected void onPause() {
         super.onPause();
+        Log.v(LOG_TAG, "onPause Called");
         progressDialog.dismiss();
     }
 
     public void signOut() {
+        Log.v(LOG_TAG, "signOut Called");
         AuthUI.getInstance()
                 .signOut(this)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -317,6 +284,7 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
 
     @Override
     public void onNoteClick(Post it) {
+        Log.v(LOG_TAG, "onNoteClick Called");
         Intent intent = new Intent(getApplicationContext(), PostActivity.class);
         intent.putExtra("Post", it);
 
@@ -325,110 +293,14 @@ public class MainActivity extends AppCompatActivity implements PostAdapter.OnNot
         finish();
     }
 
-    private int hasVoted(String postID, Transaction transaction) {
-        Log.v(LOG_TAG, "hasVoted");
-        int votedFlag;
-        DocumentReference docRef = userref.document(current_user.getUid()).collection("hasVoted").document(postID);
-        DocumentSnapshot hasVotedDoc;
-        try {
-            hasVotedDoc = transaction.get(docRef);
-            Boolean upvoted = hasVotedDoc.getBoolean("upvoted");
-            if(upvoted == null) {
-                votedFlag = 0;
-            }else if(upvoted) {
-                votedFlag = 1;
-            } else {
-                votedFlag = -1;
-            }
-        } catch (FirebaseFirestoreException e) {
-            votedFlag = 0;
-        }
-        Log.v(LOG_TAG, "hasVoted() votedFlag: " + votedFlag);
-        return votedFlag;
-    }
-
     @Override
     public void onUpvoteClick(final Post it) {
-        Log.v(LOG_TAG, "onUpvoteClick");
-        final DocumentReference postRef = dataref.document(it.getPostID());
-        final DocumentReference hasVotedRef = userref.document(current_user.getUid()).collection("hasVoted").document(it.getPostID());
-        FirebaseFirestore.getInstance().runTransaction(new Transaction.Function<Void>() {
-            @Nullable
-            @Override
-            public Void apply(@NonNull Transaction transaction) {
-                int votedFlag = hasVoted(it.getPostID(), transaction);
-                Log.v(LOG_TAG, "onUpvoteClick: Transaction: votedFlag: " + votedFlag);
-                Log.v(LOG_TAG, "Before: it.getUp, it.getDown: " + it.getUpvotes() + ", " + it.getDownvotes());
-                if(votedFlag == -1) {
-                    it.setDownvotes(it.getDownvotes() - 1);
-                    it.setUpvotes(it.getUpvotes() + 1);
-                    transaction.update(hasVotedRef, "upvoted", true);
-                } else if(votedFlag == 0) {
-                    HashMap<String, Object> hasVotedObject = new HashMap<>();
-                    hasVotedObject.put("upvoted", true);
-                    it.setUpvotes(it.getUpvotes() + 1);
-                    transaction.set(hasVotedRef, hasVotedObject, SetOptions.merge());
-                } else {
-                     it.setUpvotes(it.getUpvotes() - 1);
-                    transaction.delete(hasVotedRef);
-                }
-                Log.v(LOG_TAG, "After: it.getUp, it.getDown: " + it.getUpvotes() + ", " + it.getDownvotes());
-                transaction.update(postRef, "Dislikes", it.getDownvotes(), "Likes", it.getUpvotes());
-                return null;
-            }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.v(LOG_TAG, "Transaction Complete");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.v(LOG_TAG, "Transaction Failed: " + e.getMessage());
-            }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                adapter.updatePost(it);
-            }
-        });
+        queryUtils.onUpvoteClick(this, dataref, it, current_user, userref, adapter);
     }
 
     @Override
     public void onDownvoteClick(final Post it) {
-        Log.v(LOG_TAG, "onDownClick");
-        Toast.makeText(this, "Down", Toast.LENGTH_SHORT).show();
-        final DocumentReference postRef = dataref.document(it.getPostID());
-        final DocumentReference hasVotedRef = userref.document(current_user.getUid()).collection("hasVoted").document(it.getPostID());
-        FirebaseFirestore.getInstance().runTransaction(new Transaction.Function<Void>() {
-            @Nullable
-            @Override
-            public Void apply(@NonNull Transaction transaction) {
-                int votedFlag = hasVoted(it.getPostID(), transaction);
-                Log.v(LOG_TAG, "Before: it.getUp, it.getDown: " + it.getUpvotes() + ", " + it.getDownvotes());
-                if(votedFlag == -1) {
-                    transaction.delete(hasVotedRef);
-                    it.setDownvotes(it.getDownvotes() - 1);
-                } else if(votedFlag == 0) {
-                    HashMap<String, Object> hasVotedObject = new HashMap<>();
-                    hasVotedObject.put("upvoted", false);
-                    transaction.set(hasVotedRef, hasVotedObject, SetOptions.merge());
-                    it.setDownvotes(it.getDownvotes() + 1);
-                } else {
-                    transaction.update(hasVotedRef, "upvoted", false);
-                    it.setDownvotes(it.getDownvotes() + 1);
-                    it.setUpvotes(it.getUpvotes() - 1);
-                }
-                Log.v(LOG_TAG, "After: it.getUp, it.getDown: " + it.getUpvotes() + ", " + it.getDownvotes());
-                transaction.update(postRef, "Dislikes", it.getDownvotes(), "Likes", it.getUpvotes());
-                return null;
-            }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                adapter.updatePost(it);
-            }
-        });
+        queryUtils.onDownvoteClick(this, dataref, it, current_user, userref, adapter);
     }
 }
 

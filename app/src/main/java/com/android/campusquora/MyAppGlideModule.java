@@ -1,6 +1,7 @@
 package com.android.campusquora;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -16,8 +17,10 @@ import java.io.InputStream;
 @GlideModule
 public class MyAppGlideModule extends AppGlideModule {
 
+    private static  final String LOG_TAG = MyAppGlideModule.class.getSimpleName();
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
+        Log.v(LOG_TAG, "registerComponents Called");
         registry.append(StorageReference.class, InputStream.class, new FirebaseImageLoader.Factory());
     }
 }

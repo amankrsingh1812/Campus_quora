@@ -44,7 +44,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        Log.v(LOG_TAG, "onCreate");
+        Log.v(LOG_TAG, "onCreate Called");
 
         email = findViewById(R.id.signup_email_input);
         password = findViewById(R.id.signup_password_input);
@@ -88,7 +88,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.v(LOG_TAG, "onActivityResult");
+        Log.v(LOG_TAG, "onActivityResult Called");
 
         if(requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -108,7 +108,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
 
-        Log.v(LOG_TAG, "firebaseAuthWithGoogle");
+        Log.v(LOG_TAG, "firebaseAuthWithGoogle Called");
 
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         mAuth.signInWithCredential(credential)
@@ -128,7 +128,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void registerUser(View view) {
 
-        Log.v(LOG_TAG, "registerUser");
+        Log.v(LOG_TAG, "registerUser Called");
         String Email = email.getEditText().getText().toString().trim();
         String Password = password.getEditText().getText().toString().trim();
 

@@ -70,13 +70,13 @@ public class NewPost extends AppCompatActivity {
     private NachoTextView nachoTextView;
     private ArrayList<String> list =  new ArrayList<String>();
 
-
+    private static final String LOG_TAG = NewPost.class.getSimpleName();
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.v(LOG_TAG, "OnCreate Called");
         setContentView(R.layout.activity_new_post);
-//        String[] suggestions = new String[]{"Tortilla Chips", "Melted Cheese", "Salsa", "Guacamole", "Mexico", "Jalapeno"};
         list=getIntent().getStringArrayListExtra("list");
-//        Toast.makeText(NewPost.this, list.get(0), Toast.LENGTH_SHORT).show();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, list);
 
         nachoTextView=findViewById(R.id.spinner1);
@@ -202,17 +202,20 @@ public class NewPost extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        Log.v(LOG_TAG, "onPause Called");
         progressDialog.dismiss();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        Log.v(LOG_TAG, "onBackPressed Called");
         finish();
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 
     private void chooseImage() {
+        Log.v(LOG_TAG, "chooseImage Called");
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -221,6 +224,7 @@ public class NewPost extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.v(LOG_TAG, "onActivityResult Called");
         if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null )
         {
